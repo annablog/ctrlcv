@@ -1,11 +1,11 @@
-# CircuitPython demo - Keyboard emulator
+# Code to control keyboard with 3 keys: CONTROL (D0), C (D3), V (D4)
+# (i.e. the "Stack Overflow keyboard")
 
 import time
 
 import board
 import digitalio
 from adafruit_hid.keyboard import Keyboard
-from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 
 # A simple neat keyboard demo in CircuitPython
@@ -20,7 +20,6 @@ keys_pressed = [Keycode.CONTROL, Keycode.C, Keycode.V]
 # The keyboard object!
 time.sleep(1)  # Sleep for a bit to avoid a race condition on some systems
 keyboard = Keyboard()
-keyboard_layout = KeyboardLayoutUS(keyboard)  # We're in the US :)
 
 # Make all pin objects inputs with pullups
 for pin in keypress_pins:
@@ -33,6 +32,7 @@ led = digitalio.DigitalInOut(board.D13)
 led.direction = digitalio.Direction.OUTPUT
 
 key_state_array = {}
+# Initialise all the keys as unpressed
 for key in keys_pressed:
     key_state_array[key] = False
 
@@ -42,32 +42,21 @@ while True:
     # Check each pin
     for key_pin in key_pin_array:
         i = key_pin_array.index(key_pin)
-        key = keys_pressed[i] # Get the corresponding Keycode
+        key = keys_pressed[i]  # Get the corresponding Keycode
         if not key_state_array[key] and not key_pin.value:  # Is it grounded?
-            keyboard_layout.write("Pin %s has changed to grounded.\n" % key)
-            # Turn on the red LED
-            led.value = True
+            # Register key as pressed
             key_state_array[key] = True
 
-
         if key_state_array[key] and key_pin.value:
-            keyboard_layout.write("Pin %s has changed to not grounded.\n" % key)
-        # "Type" the Keycode or string
-            #keyboard.press(key)  # "Press"...
-            #keyboard.release_all()  # ..."Release"!
+            # Register key as unpressed
             key_state_array[key] = False
 
-        # Turn off the red LED
-            led.value = False
-
-    keys_to_press = []
+    # For each of the keys, if it's pressed, then actually press the key
     for key, value in key_state_array.items():
         if value:
-            keys_to_press.append(key)
-            keyboard_layout.write("Adding %s.\n" % key)
-    if len(keys_to_press) > 0:
-        keyboard_layout.write("Pressing %s.\n" % keys_to_press)
-        # keyboard.press(keys_to_press)
-        # keyboard.release_all()
+            keyboard.press(key)
 
-    time.sleep(0.01)
+    # Release all keys
+    keyboard.release_all()
+
+    time.sleep(0.02)
