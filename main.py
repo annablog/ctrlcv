@@ -55,7 +55,7 @@ while True:
         # "Type" the Keycode or string
             #keyboard.press(key)  # "Press"...
             #keyboard.release_all()  # ..."Release"!
-            #key_state_array[key] = False
+            key_state_array[key] = False
 
         # Turn off the red LED
         led.value = False
