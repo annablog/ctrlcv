@@ -58,14 +58,16 @@ while True:
             key_state_array[key] = False
 
         # Turn off the red LED
-        led.value = False
+            led.value = False
 
-    # keys_to_press = []
-    # for key in key_state_array.keys():
-    #     if key_state_array[key]:
-    #         keys_to_press.append(key)
-    # keyboard_layout.write("Pressing %s.\n" % keys_to_press)
-    # keyboard.press(keys_to_press)
-    # keyboard.release_all()
+    keys_to_press = []
+    for key, value in key_state_array.items():
+        if value:
+            keys_to_press.append(key)
+            keyboard_layout.write("Adding %s.\n" % key)
+    if len(keys_to_press) > 0:
+        keyboard_layout.write("Pressing %s.\n" % keys_to_press)
+        # keyboard.press(keys_to_press)
+        # keyboard.release_all()
 
     time.sleep(0.01)
