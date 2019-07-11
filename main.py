@@ -38,6 +38,10 @@ for key in keys_pressed:
 
 print("Waiting for key pin...")
 
+initial_timeout = 0.02
+letter_timeout = 0.2
+timeout = initial_timeout
+
 while True:
     # Check each pin
     for key_pin in key_pin_array:
@@ -55,8 +59,12 @@ while True:
     for key, value in key_state_array.items():
         if value:
             keyboard.press(key)
+            if key != Keycode.CONTROL:
+                timeout = letter_timeout
+
 
     # Release all keys
     keyboard.release_all()
 
-    time.sleep(0.02)
+    time.sleep(timeout)
+    timeout = initial_timeout
